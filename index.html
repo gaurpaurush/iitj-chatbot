@@ -1,16 +1,447 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>BS AI & DS Chatbot</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BS AI & DS Assistant — IIT Jodhpur</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #f5f3ee;
+      --white:     #ffffff;
+      --border:    #e2dfd7;
+      --ink:       #1a1814;
+      --ink2:      #4a4740;
+      --muted:     #8f8b83;
+      --accent:    #2563eb;
+      --accent-s:  #dbeafe;
+      --green:     #16a34a;
+      --shadow:    0 4px 24px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+      --shadow-lg: 0 16px 60px rgba(0,0,0,0.12), 0 4px 16px rgba(0,0,0,0.06);
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 15% 15%, rgba(37,99,235,0.06) 0%, transparent 45%),
+        radial-gradient(circle at 85% 80%, rgba(234,88,12,0.05) 0%, transparent 40%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,0,0,0.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,0,0,0.022) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 36px 20px 64px;
+    }
+
+    /* ── Top bar ── */
+    .topbar {
+      width: 100%;
+      max-width: 820px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 52px;
+      animation: fadeDown 0.5s ease both;
+    }
+
+    .topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .brand-icon {
+      width: 36px; height: 36px;
+      background: var(--ink);
+      border-radius: 10px;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+    }
+    .brand-name {
+      font-weight: 700;
+      font-size: 15px;
+      letter-spacing: -0.01em;
+      color: var(--ink);
+    }
+    .brand-name span {
+      display: block;
+      font-size: 11px;
+      font-weight: 400;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+    }
+
+    .topbar-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--green);
+      background: #dcfce7;
+      border: 1px solid #bbf7d0;
+      padding: 6px 14px;
+      border-radius: 50px;
+    }
+    .topbar-pill::before {
+      content: '';
+      width: 7px; height: 7px;
+      background: var(--green);
+      border-radius: 50%;
+      animation: pulse 2.5s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.35;} }
+
+    /* ── Hero ── */
+    .hero {
+      text-align: center;
+      max-width: 620px;
+      margin-bottom: 40px;
+      animation: fadeUp 0.6s ease both 0.05s;
+    }
+
+    .hero-eyebrow {
+      display: inline-block;
+      font-size: 11.5px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 18px;
+    }
+
+    .hero h1 {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(2.2rem, 5.5vw, 3.6rem);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      color: var(--ink);
+      margin-bottom: 18px;
+    }
+    .hero h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero p {
+      font-size: 1rem;
+      color: var(--ink2);
+      line-height: 1.75;
+      max-width: 460px;
+      margin: 0 auto;
+    }
+
+    /* ── Stats pill ── */
+    .stats {
+      display: flex;
+      align-items: center;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      padding: 0 6px;
+      margin-bottom: 36px;
+      box-shadow: var(--shadow);
+      animation: fadeUp 0.6s ease both 0.2s;
+    }
+    .stat {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 11px 20px;
+    }
+    .stat-icon { font-size: 15px; }
+    .stat-text {
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--ink2);
+      white-space: nowrap;
+    }
+    .stat-text strong { color: var(--ink); font-weight: 700; }
+    .stat-sep { width: 1px; height: 20px; background: var(--border); }
+
+    /* ── Chat card ── */
+    .chat-wrapper {
+      width: 100%;
+      max-width: 820px;
+      animation: fadeUp 0.7s ease both 0.3s;
+    }
+
+    .chat-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      transition: box-shadow 0.3s;
+    }
+    .chat-card:hover {
+      box-shadow: 0 20px 70px rgba(0,0,0,0.13), 0 4px 16px rgba(0,0,0,0.06);
+    }
+
+    .chat-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: #fafaf8;
+    }
+
+    .header-avatar {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .header-info { flex: 1; }
+    .header-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.01em;
+    }
+    .header-sub {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+
+    .header-badge {
+      font-size: 11.5px;
+      font-weight: 600;
+      background: var(--accent-s);
+      color: var(--accent);
+      padding: 4px 12px;
+      border-radius: 50px;
+      border: 1px solid #bfdbfe;
+    }
+
+    .chat-frame {
+      display: block;
+      width: 100%;
+      height: 520px;
+      border: none;
+    }
+
+    .chat-footer {
+      padding: 12px 24px;
+      border-top: 1px solid var(--border);
+      background: #fafaf8;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .footer-note {
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .footer-note svg { opacity: 0.4; width:13px; height:13px; }
+    .footer-link { font-size: 12px; color: var(--muted); }
+    .footer-link a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    .footer-link a:hover { text-decoration: underline; }
+
+    /* ── Chips ── */
+    .topics {
+      margin-top: 22px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+      justify-content: center;
+      animation: fadeUp 0.7s ease both 0.45s;
+    }
+    .topic-label {
+      width: 100%;
+      text-align: center;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      margin-bottom: 2px;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink2);
+      background: var(--white);
+      border: 1px solid var(--border);
+      padding: 7px 15px;
+      border-radius: 50px;
+      cursor: default;
+      transition: all 0.18s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .chip:hover {
+      border-color: #93c5fd;
+      background: var(--accent-s);
+      color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(37,99,235,0.12);
+    }
+    .chip-dot {
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+      opacity: 0.45;
+    }
+
+    /* ── Dev credit ── */
+    .dev-credit {
+      text-align: center;
+      padding: 11px 20px;
+      font-size: 12.5px;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      background: rgba(0,0,0,0.015);
+      letter-spacing: 0.01em;
+    }
+    .dev-credit strong {
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(20px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+    @keyframes fadeDown {
+      from { opacity:0; transform:translateY(-14px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    @media (max-width: 540px) {
+      .stats { border-radius: 16px; padding: 4px; flex-wrap: wrap; }
+      .stat-sep { width: 100%; height: 1px; }
+      .chat-frame { height: 440px; }
+      .topbar { flex-direction: column; gap: 10px; }
+      .hero h1 { font-size: 2.1rem; }
+    }
+  </style>
 </head>
-
 <body>
+<div class="page">
 
-<h1>BS AI & DS Assistant</h1>
-<p>Ask your doubts about IIT Jodhpur course</p>
+  <header class="topbar">
+    <div class="topbar-brand">
+      <div class="brand-icon">🎓</div>
+      <div class="brand-name">
+        IIT Jodhpur
+        <span>BS AI &amp; Data Science</span>
+      </div>
+    </div>
+    <div class="topbar-pill">Assistant Online</div>
+  </header>
 
+  <div class="hero">
+    <div class="hero-eyebrow">AI-Powered Course Assistant</div>
+    <h1>Ask anything about<br/><em>BS AI &amp; DS</em></h1>
+    <p>Get instant answers about the IIT Jodhpur programme — courses, syllabus, admissions, exams, and career paths.</p>
+  </div>
 
-<iframe width="640" height="480" src="https://embed.wotnot.io/6NoV3cYThaVD070800348048as3Lt9ad/bot/pJZ6RnFMSspT073842873294jZ7MLWZL?display_header=false&history_retention=false" frameborder="0"></iframe>
+  <div class="stats">
+    <div class="stat">
+      <span class="stat-icon">⚡</span>
+      <span class="stat-text"><strong>Instant</strong> Replies</span>
+    </div>
+    <div class="stat-sep"></div>
+    <div class="stat">
+      <span class="stat-icon">🕐</span>
+      <span class="stat-text">Available <strong>24/7</strong></span>
+    </div>
+    <div class="stat-sep"></div>
+    <div class="stat">
+      <span class="stat-icon">🎯</span>
+      <span class="stat-text">Course <strong>Focused</strong></span>
+    </div>
+  </div>
 
+  <div class="chat-wrapper">
+    <div class="chat-card">
+
+      <div class="chat-header">
+        <div class="header-avatar">🤖</div>
+        <div class="header-info">
+          <div class="header-name">BS AI &amp; DS Assistant</div>
+          <div class="header-sub">IIT Jodhpur · Ask your course doubts</div>
+        </div>
+        <div class="header-badge">AI Chatbot</div>
+      </div>
+
+      <iframe
+        class="chat-frame"
+        src="https://embed.wotnot.io/6NoV3cYThaVD070800348048as3Lt9ad/bot/pJZ6RnFMSspT073842873294jZ7MLWZL?display_header=false&history_retention=false"
+        title="BS AI & DS Chatbot"
+        allow="microphone"
+      ></iframe>
+
+      <div class="chat-footer">
+        <div class="footer-note">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          Your conversation is private
+        </div>
+        <div class="footer-link">Powered by <a href="https://wotnot.io" target="_blank" rel="noopener">WotNot</a></div>
+      </div>
+
+      <div class="dev-credit">⚡ Developed by <strong>Paurush Gaur</strong></div>
+
+    </div>
+
+    <div class="topics">
+      <div class="topic-label">Quick topics</div>
+      <span class="chip"><span class="chip-dot"></span>Courses &amp; Credits</span>
+      <span class="chip"><span class="chip-dot"></span>Admission Process</span>
+      <span class="chip"><span class="chip-dot"></span>Syllabus Details</span>
+      <span class="chip"><span class="chip-dot"></span>Exam Pattern</span>
+      <span class="chip"><span class="chip-dot"></span>Career Scope</span>
+      <span class="chip"><span class="chip-dot"></span>Fee Structure</span>
+    </div>
+
+  </div>
+</div>
 </body>
 </html>
